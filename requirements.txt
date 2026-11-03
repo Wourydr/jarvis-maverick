@@ -1,0 +1,15 @@
+ollama
+requests
+python-dotenv
+beautifulsoup4
+duckduckgo-search
+ddgs
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+edge-tts
+pygame
+SpeechRecognition
+sounddevice
+numpy
+scipy

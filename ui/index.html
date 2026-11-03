@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAVERICK — Iron Man J.A.R.V.I.S. Core Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- CONTENEUR PRINCIPAL DU HUD IRON MAN (ISOLATION POUR MIX-BLEND-MODE) -->
+    <div class="hud-stage" id="hudStage">
+        <!-- Photo de fond HUD Holographique HD -->
+        <img src="assets/hud_theme_blue_hd.jpg" class="hud-wallpaper" id="hudWallpaper" alt="JARVIS Framework HUD">
+
+        <!-- 1. CŒUR RÉACTEUR À ARC TOURNANT AU CENTRE DU TABLEAU -->
+        <div class="reactor-core-wrapper" id="reactorCoreWrap">
+            <video id="coreVideo" class="reactor-core-video" autoplay loop muted playsinline>
+                <source src="assets/jarvis_core.mp4" type="video/mp4">
+            </video>
+            <!-- Anneaux de rotation holographiques complémentaires -->
+            <div class="reactor-halo-ring halo-outer"></div>
+            <div class="reactor-halo-ring halo-inner"></div>
+            <div class="reactor-center-flare"></div>
+        </div>
+
+        <!-- 2. ŒIL D'IRON MAN LUMINEUX ET ANIMÉ -->
+        <div class="ironman-eye-glow" id="ironmanEyeGlow">
+            <div class="eye-lens-flare"></div>
+            <div class="eye-anamorphic-streak"></div>
+            <div class="eye-pupil-energy"></div>
+        </div>
+
+        <!-- 3. RADAR MÉTÉO TOURNANT (EN HAUT À DROITE) -->
+        <div class="radar-weather-anchor" id="radarWeatherAnchor">
+            <div class="radar-sweep-beam"></div>
+        </div>
+
+        <!-- 4. LIGNES DE SCAN & PARTICULES CYBER -->
+        <div class="hud-scanlines"></div>
+        <div class="hud-vignette"></div>
+
+        <!-- 5. TÉLÉMÉTRIE D'ÉTAT & SPECTRE AUDIO SOUS LE RÉACTEUR -->
+        <div class="core-telemetry-badge" id="coreStatusBadge">
+            <span class="badge-dot" id="coreBadgeDot"></span>
+            <span class="badge-text" id="coreStatusText">MAVERICK // STANDBY // DITES « HEY MAV »</span>
+        </div>
+
+        <div class="audio-spectrum" id="audioSpectrum">
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+            <div class="spec-bar"></div>
+        </div>
+    </div>
+
+    <!-- COUCHE INTERFACE UTILISATEUR HOLOGRAPHIQUE (HUD OVERLAY) -->
+    <div class="hud-ui-layer">
+        <!-- BARRE SUPÉRIEURE (HEADER STARK / JARVIS) -->
+        <header class="hud-top-bar">
+            <div class="hud-brand-box">
+                <div class="brand-title">
+                    <span class="brand-glitch" data-text="MAVERICK">MAVERICK</span>
+                    <span class="brand-badge">J.A.R.V.I.S. MARK VII</span>
+                </div>
+                <div class="brand-sub">STARK INDUSTRIES // TACTICAL A.I. CORE</div>
+            </div>
+
+            <!-- TÉLÉMÉTRIE CENTRALE -->
+            <div class="hud-telemetry-strip">
+                <div class="tele-item">
+                    <span class="tele-label">SYSTEM:</span>
+                    <span class="tele-val text-cyan">ONLINE</span>
+                </div>
+                <div class="tele-divider">/</div>
+                <div class="tele-item">
+                    <span class="tele-label">CORE:</span>
+                    <span class="tele-val text-green">ARC REACTOR ACTIVE</span>
+                </div>
+                <div class="tele-divider">/</div>
+                <div class="tele-item">
+                    <span class="tele-label">ENGINE:</span>
+                    <span class="tele-val text-purple">OLLAMA 3.2</span>
+                </div>
+            </div>
+
+            <!-- BASCULE DE MODE : HUD MAVERICK <-> STUDIO OPEN WEBUI -->
+            <div class="hud-mode-pill-group">
+                <button class="mode-pill-btn active" id="btnModeHud" onclick="basculerModeVue('hud')" title="Vue Holographique Jarvis">
+                    <span class="pill-icon">💎</span>
+                    <span class="pill-label">HUD MAVERICK</span>
+                </button>
+                <button class="mode-pill-btn" id="btnModeWebUI" onclick="basculerModeVue('webui')" title="Studio Open WebUI (Ollama, Documents, RAG)">
+                    <span class="pill-icon">🌐</span>
+                    <span class="pill-label">STUDIO OPEN WEBUI</span>
+                </button>
+            </div>
+
+            <!-- BOUTONS DE CONTRÔLE HUD -->
+            <div class="hud-top-actions">
+                <div class="hud-clock" id="clockDisplay">00:00:00</div>
+                <button class="hud-toggle-btn active" id="btnTheme" onclick="toggleTheme()" title="Basculer le thème visuel (HUD Cyan / Iron Man)">
+                    <span class="btn-icon">🎨</span>
+                    <span class="btn-text">THÈME : <strong id="themeStatus">CYAN</strong></span>
+                </button>
+                <button class="hud-toggle-btn active" id="btnLang" onclick="toggleLangue()" title="Changer la langue (FR / EN)">
+                    <span class="btn-icon">🌐</span>
+                    <span class="btn-text">LANG : <strong id="langStatus">FR</strong></span>
+                </button>
+                <button class="hud-toggle-btn active" id="btnWake" onclick="toggleWakeWord()" title="Détection 'Hey Mav'">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">HEY MAV : <strong id="wakeStatus">ON</strong></span>
+                </button>
+                <button class="hud-toggle-btn active" id="btnVoice" onclick="toggleVoice()" title="Activer / Couper la voix de Maverick">
+                    <span class="btn-icon">🔊</span>
+                    <span class="btn-text">AUDIO : <strong id="voiceStatus">ON</strong></span>
+                </button>
+                <button class="hud-toggle-btn active" id="btnVoiceProfile" onclick="toggleVoiceProfile()" title="Basculer entre la voix J.A.R.V.I.S. (IA Iron Man) et Tony Stark">
+                    <span class="btn-icon">🎙️</span>
+                    <span class="btn-text">PROFIL : <strong id="voiceProfileStatus">J.A.R.V.I.S.</strong></span>
+                </button>
+                <button class="hud-toggle-btn active" id="btnChatToggle" onclick="toggleChatPanel()" title="Masquer / Afficher le terminal">
+                    <span class="btn-icon">💬</span>
+                    <span class="btn-text">TERMINAL</span>
+                </button>
+                <button class="hud-toggle-btn btn-secondary" onclick="clearChat()" title="Effacer l'affichage">
+                    <span class="btn-icon">🧹</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONSOLE DE CONVERSATION GLASSMORPHIC (TERMINAL HUD) -->
+        <aside class="hud-terminal-panel" id="terminalPanel">
+            <div class="terminal-header">
+                <div class="terminal-title">
+                    <span class="terminal-icon">◈</span>
+                    <span>J.A.R.V.I.S. // FLUX DE DONNÉES</span>
+                </div>
+                <div class="terminal-controls">
+                    <span class="terminal-status-pill">SÉCURISÉ</span>
+                    <button class="terminal-close-btn" onclick="toggleChatPanel()" title="Masquer le terminal">×</button>
+                </div>
+            </div>
+
+            <!-- CONTENEUR DES MESSAGES -->
+            <div class="terminal-messages" id="chatMessages">
+                <!-- Les messages s'injectent ici dynamiquement en streaming -->
+            </div>
+
+            <!-- SUGGESTIONS RAPIDES -->
+            <div class="quick-chips">
+                <button class="chip-btn" onclick="basculerModeVue('webui')">🌐 Ouvrir Open WebUI</button>
+                <button class="chip-btn" onclick="poserQuestionRapide('Quelles sont les actualités dans le monde ?')">📰 Actualités</button>
+                <button class="chip-btn" onclick="poserQuestionRapide('Can you speak in English with me?')">🇬🇧 Speak English</button>
+                <button class="chip-btn" onclick="poserQuestionRapide('Qui es-tu et de quoi te souviens-tu ?')">🧠 Mémoire</button>
+            </div>
+        </aside>
+
+        <!-- CONTENEUR DU STUDIO EMBARQUÉ OPEN WEBUI -->
+        <div class="openwebui-studio-container hidden" id="openWebUiStudio">
+            <div class="webui-loading-overlay" id="webUiLoader">
+                <div class="webui-spinner"></div>
+                <div class="webui-loading-title">MAVERICK // STUDIO OPEN WEBUI</div>
+                <div class="webui-loading-sub">CONNEXION AU SERVEUR LOCAL (PORT 8080 &amp; OLLAMA 11434)...</div>
+            </div>
+            <iframe id="webUiIframe" class="webui-iframe" src="about:blank" frameborder="0" allow="microphone; camera; clipboard-write; clipboard-read"></iframe>
+        </div>
+
+        <!-- BARRE DE COMMANDE INFÉRIEURE UNIFIÉE -->
+        <footer class="hud-bottom-bar">
+            <div class="command-bar-wrapper">
+                <!-- BOUTON MICROPHONE HOLOGRAPHIQUE -->
+                <button class="hud-mic-button" id="micBtn" onclick="declencherMicro()" title="Activer l'écoute vocale">
+                    <span class="mic-icon">🎙️</span>
+                    <span class="mic-label">PARLER</span>
+                </button>
+
+                <!-- CHAMP DE COMMANDE TEXTUELLE -->
+                <div class="hud-input-container">
+                    <span class="input-prefix">JARVIS://&gt;</span>
+                    <input type="text" id="userInput" placeholder="Donnez un ordre ou dites « Hey Mav »..." autocomplete="off">
+                </div>
+
+                <!-- BOUTON ENVOYER -->
+                <button class="hud-send-button" id="sendBtn" onclick="envoyerMessage()" title="Envoyer le message">
+                    <span>TRANSMETTRE</span>
+                    <span class="send-arrow">➤</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

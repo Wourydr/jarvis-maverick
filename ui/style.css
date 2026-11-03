@@ -1,0 +1,982 @@
+:root {
+    --cyan: #00f0ff;
+    --cyan-glow: rgba(0, 240, 255, 0.55);
+    --blue-arc: #00b4d8;
+    --gold: #ffbe0b;
+    --amber: #fb8500;
+    --green: #06d6a0;
+    --red-stark: #d90429;
+    --dark-void: #02050e;
+    --panel-bg: rgba(3, 8, 20, 0.76);
+    --panel-border: rgba(0, 240, 255, 0.35);
+    --font-cyber: 'Orbitron', monospace;
+    --font-hud: 'Rajdhani', sans-serif;
+    --font-text: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--dark-void);
+    font-family: var(--font-hud);
+    color: #e0f2fe;
+    user-select: none;
+}
+
+/* ========================================================
+   1. CONTENEUR PRINCIPAL DU HUD IRON MAN (ANIMÉ)
+======================================================== */
+.hud-stage {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    overflow: hidden;
+    isolation: isolate; /* Permet aux modes mix-blend-mode de fusionner sans fond noir */
+    background: #02050e;
+}
+
+/* Photo de fond Iron Man HD */
+.hud-wallpaper {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    pointer-events: none;
+}
+
+/* ========================================================
+   2. CŒUR RÉACTEUR À ARC ROTATIF ANIMÉ (CENTRE DU TABLEAU)
+======================================================== */
+.reactor-core-wrapper {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    /* Positionné au sub-pixel près par script.js alignCoreToHud() */
+}
+
+/* La vidéo fusionne sans son fond noir */
+.reactor-core-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    mix-blend-mode: screen;
+    filter: brightness(1.2) contrast(1.15) drop-shadow(0 0 12px var(--cyan));
+    display: block;
+}
+
+/* Anneaux holographiques tournants autour du réacteur */
+.reactor-halo-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.halo-outer {
+    inset: -8px;
+    border: 1px dashed rgba(0, 240, 255, 0.45);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.2);
+    animation: rotateOuter 26s linear infinite;
+}
+
+.halo-inner {
+    inset: -18px;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    animation: rotateInner 16s linear infinite reverse;
+}
+
+.reactor-center-flare {
+    position: absolute;
+    inset: 25%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, rgba(0, 240, 255, 0.3) 50%, transparent 80%);
+    animation: corePulse 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes rotateOuter {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rotateInner {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes corePulse {
+    0% { transform: scale(0.92); opacity: 0.4; }
+    100% { transform: scale(1.08); opacity: 0.85; }
+}
+
+/* ========================================================
+   3. ŒIL D'IRON MAN LUMINEUX ET ANIMÉ (RAYONNEMENT HOLOGRAPHIQUE)
+======================================================== */
+.ironman-eye-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eye-lens-flare {
+    position: absolute;
+    width: 90px;
+    height: 45px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.95) 0%, rgba(0, 240, 255, 0.8) 35%, rgba(0, 180, 255, 0.3) 70%, transparent 100%);
+    filter: blur(4px);
+    animation: eyeFlareBreathe 3.5s ease-in-out infinite alternate;
+}
+
+.eye-anamorphic-streak {
+    position: absolute;
+    width: 220px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 240, 255, 0.2) 20%, rgba(255, 255, 255, 0.9) 50%, rgba(0, 240, 255, 0.2) 80%, transparent 100%);
+    filter: blur(1px) drop-shadow(0 0 10px var(--cyan));
+    animation: streakGlow 4s ease-in-out infinite alternate;
+}
+
+.eye-pupil-energy {
+    position: absolute;
+    width: 30px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 25px var(--cyan), 0 0 50px rgba(0, 240, 255, 0.8);
+    animation: eyePupilPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes eyeFlareBreathe {
+    0% { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.15); opacity: 1; filter: blur(3px) drop-shadow(0 0 20px var(--cyan)); }
+}
+
+@keyframes streakGlow {
+    0% { opacity: 0.4; transform: scaleX(0.8); }
+    100% { opacity: 0.95; transform: scaleX(1.15); }
+}
+
+@keyframes eyePupilPulse {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; box-shadow: 0 0 35px var(--cyan), 0 0 70px rgba(0, 240, 255, 1); }
+}
+
+/* ========================================================
+   4. RADAR MÉTÉO TOURNANT (EN HAUT À DROITE)
+======================================================== */
+.radar-weather-anchor {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.radar-sweep-beam {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.45) 0deg, transparent 65deg, transparent 360deg);
+    animation: radarSpin 4s linear infinite;
+}
+
+@keyframes radarSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================================
+   5. SCANLINES & TÉLÉMÉTRIE SOUS LE RÉACTEUR
+======================================================== */
+.hud-scanlines {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(0, 240, 255, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+    background-size: 100% 4px;
+    pointer-events: none;
+    opacity: 0.35;
+}
+
+.hud-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, transparent 65%, rgba(2, 5, 14, 0.65) 100%);
+    pointer-events: none;
+}
+
+/* Badge d'état sous le cœur */
+.core-telemetry-badge {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(3, 10, 26, 0.9);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+    animation: blinkGlow 1.5s ease-in-out infinite;
+}
+
+.badge-text {
+    font-family: var(--font-cyber);
+    font-size: 0.68rem;
+    letter-spacing: 1.2px;
+    color: var(--cyan);
+    text-transform: uppercase;
+}
+
+/* Spectre audio */
+.audio-spectrum {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 18px;
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.audio-spectrum.active {
+    opacity: 1;
+}
+
+.spec-bar {
+    width: 3px;
+    height: 4px;
+    background: var(--cyan);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--cyan);
+    transition: height 0.1s ease;
+}
+
+.audio-spectrum.active .spec-bar {
+    animation: audioWaveAnim 0.75s ease-in-out infinite alternate;
+}
+
+.audio-spectrum.active .spec-bar:nth-child(2) { animation-delay: 0.08s; }
+.audio-spectrum.active .spec-bar:nth-child(3) { animation-delay: 0.2s; }
+.audio-spectrum.active .spec-bar:nth-child(4) { animation-delay: 0.14s; }
+.audio-spectrum.active .spec-bar:nth-child(5) { animation-delay: 0.28s; }
+.audio-spectrum.active .spec-bar:nth-child(6) { animation-delay: 0.05s; }
+.audio-spectrum.active .spec-bar:nth-child(7) { animation-delay: 0.24s; }
+.audio-spectrum.active .spec-bar:nth-child(8) { animation-delay: 0.16s; }
+.audio-spectrum.active .spec-bar:nth-child(9) { animation-delay: 0.22s; }
+.audio-spectrum.active .spec-bar:nth-child(10) { animation-delay: 0.1s; }
+.audio-spectrum.active .spec-bar:nth-child(11) { animation-delay: 0.18s; }
+
+@keyframes audioWaveAnim {
+    0% { height: 4px; }
+    50% { height: 22px; }
+    100% { height: 7px; }
+}
+
+@keyframes blinkGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+/* Réactivité des états dynamiques */
+.state-listening .reactor-core-video {
+    filter: brightness(1.4) contrast(1.3) drop-shadow(0 0 25px var(--cyan)) drop-shadow(0 0 50px rgba(0, 255, 136, 0.7));
+}
+.state-listening .ironman-eye-glow .eye-pupil-energy {
+    box-shadow: 0 0 50px var(--cyan), 0 0 100px rgba(0, 240, 255, 1);
+    transform: scale(1.3);
+}
+.state-listening .badge-dot {
+    background: var(--cyan);
+    box-shadow: 0 0 15px var(--cyan);
+}
+.state-listening .halo-outer {
+    animation-duration: 8s;
+    border-color: var(--cyan);
+}
+
+.state-thinking .reactor-core-video {
+    filter: brightness(1.3) contrast(1.2) drop-shadow(0 0 25px var(--amber)) drop-shadow(0 0 50px var(--gold));
+}
+.state-thinking .badge-dot {
+    background: var(--amber);
+    box-shadow: 0 0 15px var(--amber);
+}
+.state-thinking .halo-outer {
+    animation-duration: 4s;
+    border-color: var(--amber);
+}
+
+.state-speaking .reactor-core-video {
+    filter: brightness(1.35) contrast(1.25) drop-shadow(0 0 30px var(--cyan)) drop-shadow(0 0 60px var(--blue-arc));
+}
+.state-speaking .badge-dot {
+    background: var(--green);
+    box-shadow: 0 0 15px var(--green);
+}
+
+/* ========================================================
+   6. COUCHE INTERFACE UTILISATEUR HOLOGRAPHIQUE
+======================================================== */
+.hud-ui-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+/* BARRE SUPÉRIEURE (HEADER STARK) */
+.hud-top-bar {
+    pointer-events: auto;
+    height: 60px;
+    background: linear-gradient(180deg, rgba(2, 6, 18, 0.92) 0%, rgba(2, 6, 18, 0.6) 80%, transparent 100%);
+    border-bottom: 1px solid rgba(0, 240, 255, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    backdrop-filter: blur(10px);
+}
+
+.hud-brand-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-glitch {
+    font-family: var(--font-cyber);
+    font-weight: 900;
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan-glow);
+}
+
+.brand-badge {
+    font-family: var(--font-cyber);
+    font-size: 0.62rem;
+    color: var(--cyan);
+    border: 1px solid var(--panel-border);
+    background: rgba(0, 240, 255, 0.1);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.brand-sub {
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    color: rgba(224, 242, 254, 0.6);
+    text-transform: uppercase;
+}
+
+/* Télémétrie centrale */
+.hud-telemetry-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+}
+
+.tele-item {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.tele-label {
+    color: rgba(224, 242, 254, 0.5);
+}
+
+.tele-divider {
+    color: rgba(0, 240, 255, 0.3);
+}
+
+.text-cyan { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+.text-green { color: var(--green); text-shadow: 0 0 8px rgba(6, 214, 160, 0.5); }
+.text-purple { color: #c77dff; text-shadow: 0 0 8px rgba(199, 125, 255, 0.5); }
+
+/* Actions du header */
+.hud-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hud-clock {
+    font-family: var(--font-cyber);
+    font-size: 0.9rem;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+}
+
+.hud-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(4, 12, 30, 0.72);
+    border: 1px solid rgba(0, 240, 255, 0.28);
+    color: #cbd5e1;
+    padding: 6px 11px;
+    border-radius: 4px;
+    font-family: var(--font-hud);
+    font-weight: 600;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hud-toggle-btn:hover {
+    background: rgba(0, 240, 255, 0.15);
+    border-color: var(--cyan);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.25);
+}
+
+.hud-toggle-btn.active {
+    background: rgba(0, 240, 255, 0.18);
+    border-color: var(--cyan);
+    color: var(--cyan);
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+}
+
+.hud-toggle-btn.btn-secondary {
+    padding: 6px 10px;
+}
+
+/* ========================================================
+   7. CONSOLE DE CONVERSATION GLASSMORPHIC (TERMINAL HUD)
+======================================================== */
+.hud-terminal-panel {
+    pointer-events: auto;
+    position: absolute;
+    right: 20px;
+    top: auto;
+    bottom: 90px;
+    height: 440px;
+    max-height: calc(100vh - 180px);
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 240, 255, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    z-index: 20;
+}
+
+.hud-terminal-panel.hidden {
+    transform: translateX(420px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.terminal-header {
+    height: 38px;
+    background: rgba(0, 240, 255, 0.08);
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+}
+
+.terminal-title {
+    font-family: var(--font-cyber);
+    font-size: 0.68rem;
+    letter-spacing: 1.5px;
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terminal-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.terminal-status-pill {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--green);
+    background: rgba(6, 214, 160, 0.12);
+    border: 1px solid rgba(6, 214, 160, 0.4);
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.terminal-close-btn {
+    background: transparent;
+    border: none;
+    color: rgba(224, 242, 254, 0.6);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+}
+.terminal-close-btn:hover {
+    color: #fff;
+}
+
+/* Messages */
+.terminal-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+}
+
+.terminal-messages::-webkit-scrollbar {
+    width: 4px;
+}
+.terminal-messages::-webkit-scrollbar-thumb {
+    background: rgba(0, 240, 255, 0.3);
+    border-radius: 3px;
+}
+
+.history-separator {
+    text-align: center;
+    font-family: var(--font-cyber);
+    font-size: 0.62rem;
+    letter-spacing: 1px;
+    color: rgba(0, 240, 255, 0.5);
+    margin: 6px 0;
+}
+
+/* Bulles de message */
+.message-bubble {
+    display: flex;
+    flex-direction: column;
+    max-width: 92%;
+    animation: fadeInMessage 0.25s ease-out;
+}
+
+@keyframes fadeInMessage {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-bubble.user {
+    align-self: flex-end;
+}
+
+.message-bubble.assistant {
+    align-self: flex-start;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+    font-family: var(--font-cyber);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+}
+
+.message-bubble.user .message-header {
+    color: #93c5fd;
+    justify-content: flex-end;
+}
+
+.message-bubble.assistant .message-header {
+    color: var(--cyan);
+}
+
+.message-badge {
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+    font-size: 0.6rem;
+    padding: 1px 5px;
+    border-radius: 3px;
+}
+
+.message-text {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-family: var(--font-text);
+    font-size: 0.86rem;
+    line-height: 1.45;
+    word-break: break-word;
+    user-select: text;
+}
+
+.message-bubble.user .message-text {
+    background: linear-gradient(135deg, rgba(0, 136, 255, 0.3) 0%, rgba(0, 240, 255, 0.15) 100%);
+    border: 1px solid rgba(0, 240, 255, 0.4);
+    border-bottom-right-radius: 2px;
+    color: #f0fdf4;
+}
+
+.message-bubble.assistant .message-text {
+    background: rgba(3, 12, 30, 0.72);
+    border: 1px solid rgba(0, 240, 255, 0.25);
+    border-bottom-left-radius: 2px;
+    color: #e2e8f0;
+}
+
+.message-bubble.assistant .message-text strong {
+    color: var(--cyan);
+}
+
+.typing-cursor {
+    display: inline-block;
+    color: var(--cyan);
+    font-weight: 900;
+    margin-left: 2px;
+    animation: blinkCursor 0.8s infinite;
+}
+
+@keyframes blinkCursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Suggestions rapides */
+.quick-chips {
+    padding: 8px 12px;
+    background: rgba(2, 6, 16, 0.65);
+    border-top: 1px solid rgba(0, 240, 255, 0.15);
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+}
+
+.quick-chips::-webkit-scrollbar {
+    display: none;
+}
+
+.chip-btn {
+    white-space: nowrap;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    color: #e0f2fe;
+    font-family: var(--font-hud);
+    font-size: 0.73rem;
+    font-weight: 600;
+    padding: 4px 9px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip-btn:hover {
+    background: rgba(0, 240, 255, 0.22);
+    border-color: var(--cyan);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+/* ========================================================
+   8. BARRE DE COMMANDE INFÉRIEURE UNIFIÉE
+======================================================== */
+.hud-bottom-bar {
+    pointer-events: auto;
+    height: 78px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    background: linear-gradient(0deg, rgba(2, 6, 18, 0.95) 0%, rgba(2, 6, 18, 0.5) 80%, transparent 100%);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 240, 255, 0.18);
+}
+
+.command-bar-wrapper {
+    width: 100%;
+    max-width: 860px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Bouton Micro */
+.hud-mic-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(0, 136, 255, 0.25) 100%);
+    border: 1px solid var(--cyan);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: var(--font-cyber);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.25);
+    transition: all 0.2s ease;
+}
+
+.hud-mic-button:hover {
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.35) 0%, rgba(0, 136, 255, 0.4) 100%);
+    box-shadow: 0 0 22px rgba(0, 240, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+.hud-mic-button.listening {
+    border-color: #ff0077;
+    background: linear-gradient(135deg, rgba(255, 0, 119, 0.4) 0%, rgba(255, 170, 0, 0.3) 100%);
+    box-shadow: 0 0 25px rgba(255, 0, 119, 0.6);
+    animation: pulseListening 1.2s infinite alternate;
+}
+
+@keyframes pulseListening {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.03); }
+}
+
+.mic-icon {
+    font-size: 1.05rem;
+}
+
+/* Champ de saisie */
+.hud-input-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: rgba(3, 10, 26, 0.85);
+    border: 1px solid var(--panel-border);
+    border-radius: 6px;
+    padding: 3px 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: inset 0 0 12px rgba(0, 240, 255, 0.08);
+    transition: all 0.2s ease;
+}
+
+.hud-input-container:focus-within {
+    border-color: var(--cyan);
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.28), inset 0 0 12px rgba(0, 240, 255, 0.12);
+}
+
+.input-prefix {
+    font-family: var(--font-cyber);
+    font-size: 0.78rem;
+    color: var(--cyan);
+    letter-spacing: 1px;
+    margin-right: 8px;
+}
+
+#userInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-family: var(--font-hud);
+    font-size: 1.02rem;
+    letter-spacing: 0.8px;
+    padding: 8px 0;
+}
+
+#userInput::placeholder {
+    color: rgba(224, 242, 254, 0.4);
+    font-style: italic;
+}
+
+/* Bouton Envoyer */
+.hud-send-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 240, 255, 0.15);
+    border: 1px solid var(--panel-border);
+    color: var(--cyan);
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: var(--font-cyber);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hud-send-button:hover {
+    background: var(--cyan);
+    color: var(--dark-void);
+    border-color: var(--cyan);
+    box-shadow: 0 0 18px rgba(0, 240, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .hud-telemetry-strip {
+        display: none;
+    }
+    .hud-terminal-panel {
+        width: calc(100vw - 32px);
+        right: 16px;
+        left: 16px;
+        top: 68px;
+        bottom: 86px;
+    }
+}
+
+/* ========================================================
+   8. STUDIO EMBARQUÉ OPEN WEBUI DANS MAVERICK
+======================================================== */
+.hud-mode-pill-group {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 240, 255, 0.08);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 2px;
+    gap: 4px;
+    margin-right: 6px;
+}
+
+.mode-pill-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: rgba(224, 242, 254, 0.6);
+    font-family: var(--font-cyber);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.mode-pill-btn:hover {
+    color: #fff;
+}
+
+.mode-pill-btn.active {
+    background: var(--cyan);
+    color: #02050e;
+    font-weight: 700;
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.6);
+}
+
+.openwebui-studio-container {
+    position: absolute;
+    top: 52px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #02050e;
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.openwebui-studio-container.hidden {
+    display: none;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.webui-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #0d1117;
+}
+
+.webui-loading-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(3, 10, 26, 0.95), #02050e);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    z-index: 30;
+    transition: opacity 0.4s ease;
+}
+
+.webui-loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.webui-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(0, 240, 255, 0.15);
+    border-top: 3px solid var(--cyan);
+    border-radius: 50%;
+    animation: webuiSpin 1s linear infinite;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+}
+
+@keyframes webuiSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.webui-loading-title {
+    font-family: var(--font-cyber);
+    font-size: 0.9rem;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--cyan-glow);
+}
+
+.webui-loading-sub {
+    font-size: 0.75rem;
+    color: rgba(224, 242, 254, 0.6);
+    letter-spacing: 1.5px;
+    font-family: var(--font-tech);
+}
